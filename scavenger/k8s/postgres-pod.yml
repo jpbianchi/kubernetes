@@ -6,3 +6,6 @@ spec:
   containers:
     - name: postgres
       image: postgres
+      env:  # was missing
+        - name: POSTGRES_PASSWORD  
+          value: "supersecret"
