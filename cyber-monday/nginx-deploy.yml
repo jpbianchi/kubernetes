@@ -3,7 +3,17 @@ kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-# TODO:
-# - Add replicas
-# - Add a selector that matches labels `just-a-pod`
-# - Add a template for the nginx container used in `nginx-pod.yml`
+  replicas: 3
+  selector:  # defines how the Deployment finds which Pods to manage.ku
+    matchLabels:
+      app: just-a-pod 
+  template:  # used when creating new pods
+    metadata:
+      labels:
+        app: just-a-pod   # same name used in nginx-pod.yml
+    spec: # to create each pod
+      containers:
+      - name: nginx-pod 
+        image: nginx:latest 
+        ports:
+        - containerPort: 80

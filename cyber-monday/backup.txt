@@ -1,9 +1,29 @@
-# NOTE: For these commands your current working directory should be: 
+# NOTE: For these commands our current working directory should be: 
 # /workspaces/intro-to-kube/cyber-monday
-# TODO: Enter kubectl cp command used to get `log.sh` file into the Pod
-< ANSWER HERE >
-# TODO: Enter kubectl exec command used to execute the `log.sh`
-< ANSWER HERE >
-# TODO: Enter kubectl cp command used to copy the log file from inside the
-# Pod to your current working directory
-< ANSWER HERE >
+
+# kubectl cp command used to get `log.sh` file into the Pod
+find the pod names with kubectl get pods, and do the following for all of them
+
+kubectl cp log.sh nginx-deployment-59d4df587f-fhfjx:/tmp/log.sh
+
+# kubectl exec command used to execute the `log.sh` in all pods
+kubectl exec nginx-deployment-59d4df587f-fhfjx -- /bin/sh -c "chmod 777 /tmp/log.sh && touch /tmp/foo.log"
+kubectl exec nginx-deployment-59d4df587f-fhfjx -- /bin/sh -c "/tmp/log.sh"
+
+# kubectl cp command used to copy the log file from inside the Pod to our working directory
+kubectl cp nginx-deployment-59d4df587f-fhfjx:/tmp/foo.log ./foo.log-nginx-59d4df587f-fhfjx
+
+# or read it from outside the pod
+kubectl exec nginx-deployment-59d4df587f-fhfjx -- /bin/sh -c "tail -n 10 /tmp/foo.log"
+
+    # I got
+    {"item": "stylus pen", "user": 219, "date": "2023-09-28T12:05:39Z"}
+    {"item": "USB hub", "user": 681, "date": "2023-09-28T12:05:39Z"}
+    {"item": "computer case", "user": 197, "date": "2023-09-28T12:05:39Z"}
+    {"item": "robotic prosthetic", "user": 124, "date": "2023-09-28T12:05:39Z"}
+    {"item": "game controller", "user": 669, "date": "2023-09-28T12:05:39Z"}
+    {"item": "RAM", "user": 866, "date": "2023-09-28T12:05:39Z"}
+    {"item": "circuit simulator", "user": 967, "date": "2023-09-28T12:05:39Z"}
+    {"item": "handheld scanner", "user": 755, "date": "2023-09-28T12:05:39Z"}
+    {"item": "3D printer", "user": 167, "date": "2023-09-28T12:05:39Z"}
+    {"item": "LED matrix display", "user": 604, "date": "2023-09-28T12:05:39Z"}
