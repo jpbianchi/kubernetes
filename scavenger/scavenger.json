@@ -7,6 +7,9 @@
     "4": "1",
     "5": "1"
   },
-  "mark-ii": { "6": "POSTGRES_PASSWORD", "7": "Put answer here" },
-  "mark-iii": { "8": "Error from server (BadRequest): container \"nginx\" in pod \"nginx\" is waiting to start: trying and failing to pull image", "9": "Put answer here" }
+  "mark-ii": { "6": "POSTGRES_PASSWORD", "7": "Error from server (BadRequest): container \"nginx\" in pod \"nginx\" is waiting to start: trying and failing to pull image" },
+
+  "mark-iii": {
+    "8": "env: - name: POSTGRES_PASSWORD value: \"supersecret\"",
+    "9": "nginx"
 }
