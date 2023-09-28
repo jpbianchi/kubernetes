@@ -13,3 +13,4 @@
     "8": "env: - name: POSTGRES_PASSWORD value: \"supersecret\"",
     "9": "nginx" 
 }
+}
