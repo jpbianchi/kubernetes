@@ -10,3 +10,6 @@ spec:
     - port: 5432
   selector:
     app: postgres
+
+# kubectl apply -f postgres-service.yml
+# service/postgres created

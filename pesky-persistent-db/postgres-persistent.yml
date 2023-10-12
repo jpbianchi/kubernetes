@@ -6,6 +6,13 @@ metadata:
     type: local
     app: postgres
 spec:
+  storageClassName: manual  # ie we dont let k8s create PV and bind to PVCku
+  capacity:
+    storage: 5Gi 
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data 
   # TODO: Fill in the persistent volume specifications:
   # a. storageClassName as manual
   # b. capacity as 5Gi
@@ -19,7 +26,21 @@ metadata:
   labels:
     app: postgres
 spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi 
+
   # TODO: Fill in the persistent volume claim specifications:
   # a. storageClassName as manual
   # b. accessModes as ReadWriteMany
   # c. resource requests for storage to be 5Gi
+
+# kubectl apply -f postgres-persistent.yml 
+# persistentvolume/postgres-pv-volume created
+# persistentvolumeclaim/postgres-pv-claim created
+
+# kubectl explain pv.spec --recursive  gives full yml structure
+# kubectl explain pvc.spec --recursive

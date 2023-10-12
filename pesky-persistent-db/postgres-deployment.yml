@@ -18,9 +18,178 @@ spec:
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432 # Exposes container port
+          envFrom: 
+            - configMapRef:  # imports all the data at once
+                name: postgres-config
+            - secretRef:
+                name: postgres-secret
+          
+          # env:  # not necessary, envFrom imports everything
+          #   - name: POSTGRESS_PASSWORD
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: postgres-config
+          #         key: POSTGRESS_PASSWORD
+
+          volumeMounts:
+            - name: postgresdb
+              mountPath: /var/lib/postgresql/data
+
+      volumes: 
+        - name: postgresdb
+          persistentVolumeClaim: 
+            claimName: postgres-pv-claim
+
           # TODO:
           # a. Add a config map reference to your secrets
           # b. Add the following volumeMounts:
           #        mountPath: /var/lib/postgresql/data
           #        name to be postgredb
           # c. Add the persistent volume claim from postgres-persistent.yml
+
+# I used kubectl explain deployment.spec --recursive
+# to know how to build it
+
+
+
+# kubectl describe pod postgres-6d8577568d-4krhd
+# Name:             postgres-6d8577568d-4krhd
+# Namespace:        default
+# Priority:         0
+# Service Account:  default
+# Node:             minikube/192.168.49.2
+# Start Time:       Thu, 12 Oct 2023 18:30:04 +0000
+# Labels:           app=postgres
+#                   pod-template-hash=6d8577568d
+# Annotations:      <none>
+# Status:           Running
+# IP:               10.244.0.89
+# IPs:
+#   IP:           10.244.0.89
+# Controlled By:  ReplicaSet/postgres-6d8577568d
+# Containers:
+#   postgres:
+#     Container ID:   docker://d19a9e01627a7ee36a54ccbb5b7a0de2c610e196e95e92726908fcfd72a4c593
+#     Image:          postgres:10.1
+#     Image ID:       docker-pullable://postgres@sha256:3f4441460029e12905a5d447a3549ae2ac13323d045391b0cb0cf8b48ea17463
+#     Port:           5432/TCP
+#     Host Port:      0/TCP
+#     State:          Running
+#       Started:      Thu, 12 Oct 2023 18:30:05 +0000
+#     Ready:          True
+#     Restart Count:  0
+#     Environment Variables from:
+#       postgres-config  ConfigMap  Optional: false
+#     Environment:       <none>
+#     Mounts:
+#       /var/lib/postgresql/data from postgresdb (rw)
+#       /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-q5ls9 (ro)
+# Conditions:
+#   Type              Status
+#   Initialized       True 
+#   Ready             True 
+#   ContainersReady   True 
+#   PodScheduled      True 
+# Volumes:
+#   postgresdb:
+#     Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+#     ClaimName:  postgres-pv-claim
+#     ReadOnly:   false
+#   kube-api-access-q5ls9:
+#     Type:                    Projected (a volume that contains injected data from multiple sources)
+#     TokenExpirationSeconds:  3607
+#     ConfigMapName:           kube-root-ca.crt
+#     ConfigMapOptional:       <nil>
+#     DownwardAPI:             true
+# QoS Class:                   BestEffort
+# Node-Selectors:              <none>
+# Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+#                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+# Events:
+#   Type    Reason     Age   From               Message
+#   ----    ------     ----  ----               -------
+#   Normal  Scheduled  10m   default-scheduler  Successfully assigned default/postgres-6d8577568d-4krhd to minikube
+#   Normal  Pulled     10m   kubelet            Container image "postgres:10.1" already present on machine
+#   Normal  Created    10m   kubelet            Created container postgres
+#   Normal  Started    10m   kubelet            Started container postgres
+
+# kubectl exec -it postgres-6d8577568d-4krhd -- ls -al /var/lib/postgresql/data
+# total 128
+# drwx------ 19 postgres root      4096 Oct 12 18:30 .
+# drwxr-xr-x  1 postgres postgres  4096 Dec 12  2017 ..
+# drwx------  6 postgres postgres  4096 Oct 12 18:30 base
+# drwx------  2 postgres postgres  4096 Oct 12 18:31 global
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_commit_ts
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_dynshmem
+# -rw-------  1 postgres postgres  4535 Oct 12 18:30 pg_hba.conf
+# -rw-------  1 postgres postgres  1636 Oct 12 18:30 pg_ident.conf
+# drwx------  4 postgres postgres  4096 Oct 12 18:35 pg_logical
+# drwx------  4 postgres postgres  4096 Oct 12 18:30 pg_multixact
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_notify
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_replslot
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_serial
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_snapshots
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_stat
+# drwx------  2 postgres postgres  4096 Oct 12 18:48 pg_stat_tmp
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_subtrans
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_tblspc
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_twophase
+# -rw-------  1 postgres postgres     3 Oct 12 18:30 PG_VERSION
+# drwx------  3 postgres postgres  4096 Oct 12 18:30 pg_wal
+# drwx------  2 postgres postgres  4096 Oct 12 18:30 pg_xact
+# -rw-------  1 postgres postgres    88 Oct 12 18:30 postgresql.auto.conf
+# -rw-------  1 postgres postgres 22729 Oct 12 18:30 postgresql.conf
+# -rw-------  1 postgres postgres    36 Oct 12 18:30 postmaster.opts
+# -rw-------  1 postgres postgres    94 Oct 12 18:30 postmaster.pid
+
+# kubectl describe deployment postgres
+# Name:                   postgres
+# Namespace:              default
+# CreationTimestamp:      Thu, 12 Oct 2023 18:30:04 +0000
+# Labels:                 <none>
+# Annotations:            deployment.kubernetes.io/revision: 1
+# Selector:               app=postgres
+# Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+# StrategyType:           RollingUpdate
+# MinReadySeconds:        0
+# RollingUpdateStrategy:  25% max unavailable, 25% max surge
+# Pod Template:
+#   Labels:  app=postgres
+#   Containers:
+#    postgres:
+#     Image:      postgres:10.1
+#     Port:       5432/TCP
+#     Host Port:  0/TCP
+#     Environment Variables from:
+#       postgres-config  ConfigMap  Optional: false
+#     Environment:       <none>
+#     Mounts:
+#       /var/lib/postgresql/data from postgresdb (rw)
+#   Volumes:
+#    postgresdb:
+#     Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+#     ClaimName:  postgres-pv-claim
+#     ReadOnly:   false
+# Conditions:
+#   Type           Status  Reason
+#   ----           ------  ------
+#   Available      True    MinimumReplicasAvailable
+#   Progressing    True    NewReplicaSetAvailable
+# OldReplicaSets:  <none>
+# NewReplicaSet:   postgres-6d8577568d (1/1 replicas created)
+# Events:
+#   Type    Reason             Age   From                   Message
+#   ----    ------             ----  ----                   -------
+#   Normal  ScalingReplicaSet  19m   deployment-controller  Scaled up replica set postgres-6d8577568d to 1
+
+# use the following command to access the db 
+# psql -h $(minikube ip) -p $(minikube service postgres --url --format={{.Port}}) -U admin -d postgresdb --password
+
+# then, input
+# CREATE TABLE roles( role_id serial PRIMARY KEY, role_name VARCHAR (255) UNIQUE NOT NULL ); INSERT INTO PUBLIC.ROLES VALUES (1, 'student');
+# then SELECT * FROM PUBLIC.ROLES;
+# returns
+#  role_id | role_name 
+# ---------+-----------
+#        1 | student
+# (1 row)
