@@ -4,6 +4,86 @@ metadata:
   name: network-policy-for-namespace-a
   namespace: namespace-a
 spec:
-  # TODO:
-  # Define ingress
-  # Define egress
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: namespace-b
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: namespace-b
+    - namespaceSelector:
+        matchLabels:
+          name: namespace-c
+
+# kubectl get pods --all_namespaces -o wide
+# NAMESPACE              NAME                                         READY   STATUS    RESTARTS       AGE    IP             NODE       NOMINATED NODE   READINESS GATES
+# backup                 postgres-pod                                 1/1     Running   3 (2m1s ago)   22h    10.244.0.151   minikube   <none>           <none>
+# database               postgres-pod                                 1/1     Running   3 (2m ago)     22h    10.244.0.148   minikube   <none>           <none>
+# default                postgres-cb585cd44-65tgg                     1/1     Running   4 (2m ago)     46h    10.244.0.153   minikube   <none>           <none>
+# dev                    nginx-deployment-55f598f8d-ccjjj             1/1     Running   3 (2m1s ago)   22h    10.244.0.145   minikube   <none>           <none>
+# dev                    nginx-deployment-55f598f8d-fwj96             1/1     Running   3 (2m1s ago)   22h    10.244.0.141   minikube   <none>           <none>
+# dev                    nginx-deployment-55f598f8d-wtjnv             1/1     Running   3 (2m1s ago)   22h    10.244.0.143   minikube   <none>           <none>
+# kube-system            coredns-5d78c9869d-24vqx                     1/1     Running   3 (116s ago)   22h    10.244.0.144   minikube   <none>           <none>
+# kube-system            etcd-minikube                                1/1     Running   9 (2m1s ago)   2d5h   192.168.49.2   minikube   <none>           <none>
+# kube-system            kube-apiserver-minikube                      1/1     Running   9 (111s ago)   2d5h   192.168.49.2   minikube   <none>           <none>
+# kube-system            kube-controller-manager-minikube             1/1     Running   9 (2m1s ago)   2d5h   192.168.49.2   minikube   <none>           <none>
+# kube-system            kube-proxy-gvpcg                             1/1     Running   5 (2m1s ago)   2d5h   192.168.49.2   minikube   <none>           <none>
+# kube-system            kube-scheduler-minikube                      1/1     Running   9 (2m ago)     2d5h   192.168.49.2   minikube   <none>           <none>
+# kube-system            storage-provisioner                          1/1     Running   7 (2m ago)     2d2h   192.168.49.2   minikube   <none>           <none>
+# kubernetes-dashboard   dashboard-metrics-scraper-5dd9cbfd69-tnw5s   1/1     Running   3 (2m ago)     22h    10.244.0.150   minikube   <none>           <none>
+# kubernetes-dashboard   kubernetes-dashboard-5c5cfc8747-q99t9        1/1     Running   3 (2m1s ago)   22h    10.244.0.142   minikube   <none>           <none>
+# namespace-a            nginx                                        1/1     Running   0              72s    10.244.0.156   minikube   <none>           <none>
+# namespace-b            nginx                                        1/1     Running   0              71s    10.244.0.157   minikube   <none>           <none>
+# namespace-c            postgres                                     1/1     Running   0              71s    10.244.0.158   minikube   <none>           <none>
+# prod                   nginx-deployment-55f598f8d-jvvdf             1/1     Running   3 (2m1s ago)   22h    10.244.0.146   minikube   <none>           <none>
+# prod                   nginx-deployment-55f598f8d-q8nrs             1/1     Running   3 (2m ago)     22h    10.244.0.149   minikube   <none>           <none>
+# prod                   nginx-deployment-55f598f8d-t4qsx             1/1     Running   3 (2m1s ago)   22h    10.244.0.147   minikube   <none>           <none>
+# staging                nginx-deployment-55f598f8d-892lq             1/1     Running   3 (2m1s ago)   22h    10.244.0.154   minikube   <none>           <none>
+# staging                nginx-deployment-55f598f8d-mkstx             1/1     Running   3 (2m1s ago)   22h    10.244.0.155   minikube   <none>           <none>
+# staging                nginx-deployment-55f598f8d-xcq7s             1/1     Running   3 (2m ago)     22h    10.244.0.152   minikube   <none>           <none>
+
+# kubectl exec nginx -n namespace-a -- curl 10.244.0.157:80
+#   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#                                  Dload  Upload   Total   Spent    Left  Speed
+# 100   615  100   615    0     0  71988      0 --:--:-- --:--:-- --:--:-- 76875
+# <!DOCTYPE html>
+# <html>
+# <head>
+# <title>Welcome to nginx!</title>
+# <style>
+# html { color-scheme: light dark; }
+# body { width: 35em; margin: 0 auto;
+# font-family: Tahoma, Verdana, Arial, sans-serif; }
+# </style>
+# </head>
+# <body>
+# <h1>Welcome to nginx!</h1>
+# <p>If you see this page, the nginx web server is successfully installed and
+# working. Further configuration is required.</p>
+
+# <p>For online documentation and support please refer to
+# <a href="http://nginx.org/">nginx.org</a>.<br/>
+# Commercial support is available at
+# <a href="http://nginx.com/">nginx.com</a>.</p>
+
+# <p><em>Thank you for using nginx.</em></p>
+# </body>
+# </html>
+
+# kubectl exec nginx -n namespace-c -- curl 10.244.0.156:80
+# Error from server (NotFound): pods "nginx" not found. # because c has no egress policy to a
+
+# let's ping the postgres server in namespace-a at port 5432
+# kubectl exec nginx -n namespace-a -- curl 10.244.0.158:5432
+#   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#                                  Dload  Upload   Total   Spent    Left  Speed
+#   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+# curl: (52) Empty reply from server
+# command terminated with exit code 52
