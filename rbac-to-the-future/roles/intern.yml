@@ -4,8 +4,9 @@ metadata:
   name: Intern
   namespace: dev
 rules:
-# TODO:
-# target pods with verbs get, watch, list
+- apiGroups: [""] # "" is the core API group
+  resources: ["pods", "deployments"]
+  verbs: ["get", "list", "watch"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -13,7 +14,45 @@ metadata:
   name: InternBinding
   namespace: dev
 subjects:
-# TODO: add Jules as target user
-# note: this is case sensitive
+# challenge, see https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+# but how do we add people into specific groups?
+# - kind: Group
+#   name: "software-developer"
+#   apiGroup: rbac.authorization.k8s.io
+- kind: User 
+  name: Jules
+  apiGroup: rbac.authorization.k8s.io 
 roleRef:
-# TODO: add target role to Intern
+  kind: Role 
+  name: Intern
+  apiGroup: rbac.authorization.k8s.io
+
+# kubectl apply -f roles/intern.yml
+
+# kubectl config use-context Jules-context
+# Switched to context "Jules-context"
+
+# kubectl get pods --namespace staging
+# Error from server (Forbidden): pods is forbidden: User "Jules" cannot list resource "pods" in API group "" in the namespace "staging"
+
+# @jpbianchi ➜ /workspaces/kubernetes/rbac-to-the-future (rbac-jpbianchi) $ kubectl run my-pod --image=nginx --namespace dev
+# Error from server (Forbidden): pods is forbidden: User "Jules" cannot create resource "pods" in API group "" in the namespace "dev"
+
+# kubectl get pods --namespace dev
+# NAME                               READY   STATUS    RESTARTS   AGE
+# nginx-deployment-55f598f8d-ccjjj   1/1     Running   0          10m
+# nginx-deployment-55f598f8d-fwj96   1/1     Running   0          10m
+# nginx-deployment-55f598f8d-wtjnv   1/1     Running   0          10m
+
+# kubectl get pods --namespace dev
+# NAME                               READY   STATUS    RESTARTS   AGE
+# nginx-deployment-55f598f8d-ccjjj   1/1     Running   0          124m
+# nginx-deployment-55f598f8d-fwj96   1/1     Running   0          124m
+# nginx-deployment-55f598f8d-wtjnv   1/1     Running   0          124m
+
+# kubectl delete roles --all --force
+# kubectl delete rolebindings --all --force
+
+# ERROR rror from server (Forbidden): roles.rbac.authorization.k8s.io is forbidden: User "Jules" cannot list resource "roles" in API group "rbac.authorization.k8s.io" in the namespace "default"
+# see course video, teacher has exact same problem @ 1h01'
+# https://uplimit.zoom.us/rec/play/4J7yfSuI6Dd0tj4RRF7N-Z8vlwFQbTLMs8e58XY4hDnq6K-iH84d3Yt82QB6gfm5G6gzv-QlZ8dlMAIa.PO2P4-umkBLbcVLg?canPlayFromShare=true&from=share_recording_detail&continueMode=true&componentName=rec-play&originRequestUrl=https%3A%2F%2Fuplimit.zoom.us%2Frec%2Fshare%2FlElJOUNZIPXgxRtUc68JNi6Fi7zcZTNSzNFoFNabI6OQX5daTqj4is4t7izgaYhC.b2GeHoOQEx04_1CG

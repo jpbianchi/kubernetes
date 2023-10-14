@@ -1,0 +1,56 @@
+# I didn't run this config
+
+# ClusterRole for Software Engineers
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: software-engineers
+rules:
+- apiGroups: [""]
+  resources: ["pods", "deployments"]
+  verbs: ["get", "watch", "list", "create", "update"]  # let's assume no 'delete' like the 'developer' role
+  # I hope this will be restricted for the intern according to the Intern role
+---
+# ClusterRole for Data Engineers
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: data-engineers
+rules:
+- apiGroups: [""]
+  resources: ["*"]  
+  verbs: ["*"]
+---
+# ClusterRoleBinding for Software Engineers
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: software-engineers-binding
+subjects:
+- kind: User
+  name: Joey
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: Jesus
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: Jules
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: software-engineers
+  apiGroup: rbac.authorization.k8s.io
+---
+# ClusterRoleBinding for Data Engineers
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: data-engineers-binding
+subjects:
+- kind: User
+  name: Jessica
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: data-engineers
+  apiGroup: rbac.authorization.k8s.io

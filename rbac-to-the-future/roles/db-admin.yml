@@ -2,18 +2,73 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: DBAdmin
-  namespace: database # TODO: Re-run this file with other necessary ns
+  namespace: database
+
 rules:
-# TODO:
-# target all resources with full access
+  - apiGroups: [""]
+    resources: ["*"] # all resources with full access
+    verbs: ["*"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: DBAdminBinding
-  namespace: database # TODO: Re-run this file with other necessary ns, match with role above
+  namespace: database # TODO: Re-run this file with other necessary namespace, match with role above - no, I'll create it below
 subjects:
-# TODO: add Jessica as target user
-# note: this is case sensitive
+  - kind: User 
+    name: Jessica
+    apiGroup: rbac.authorization.k8s.io 
 roleRef:
-# TODO: add target role to DBAdmin
+  kind: Role 
+  name: DBAdmin
+
+---
+# now for backup namespace
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: DBAdmin
+  namespace: backup
+
+rules:
+  - apiGroups: [""]
+    resources: ["*"] # all resources with full access
+    verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: DBAdminBinding
+  namespace: backup
+subjects:
+  - kind: User 
+    name: Jessica
+    apiGroup: rbac.authorization.k8s.io 
+roleRef:
+  kind: Role 
+  name: DBAdmin
+
+
+# kubectl apply -f roles/db-admin.yml
+
+# kubectl config use-context Jessica-context
+
+# kubectl config get-contexts
+# CURRENT   NAME              CLUSTER    AUTHINFO   NAMESPACE
+#           Jessica-context   minikube   Jessica    
+#           Jesus-context     minikube   Jesus      
+#           Joey-context      minikube   Joey       
+# *         Jules-context     minikube   Jules      
+#           minikube          minikube   minikube   default
+
+# use the minikube context to list roles and rolebindings otherwise, if you're in a user context
+# you'll get an error if that user doesn't have a 'list' permissions
+# e.g. user "Jessica" cannot list resource "rolebindings" in API group "rbac.authorization.k8s.io" in the namespace "backup"
+# kubectl config use-context minikube 
+# kubectl get roles -n database
+# NAME      CREATED AT
+# DBAdmin   2023-10-14T15:14:28Z
+
+# kubectl get rolebindings -n database
+# NAME             ROLE           AGE
+# DBAdminBinding   Role/DBAdmin   47m

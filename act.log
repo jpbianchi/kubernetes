@@ -1,0 +1,11 @@
+7[?25l8[0G[2K[1;92m? [0m[1;99mPlease choose the default image you want to use with act:
+
+  - Large size image: +20GB Docker image, includes almost all tools used on GitHub Actions (IMPORTANT: currently only ubuntu-18.04 platform is available)
+  - Medium size image: ~500MB, includes only necessary tools to bootstrap actions and aims to be compatible with all actions
+  - Micro size image: <200MB, contains only NodeJS required to bootstrap actions, doesn't work with all actions
+
+Default image and other options can be changed manually in ~/.actrc (please refer to https://github.com/nektos/act#configuration for additional information about file structure)[0m  [36m[Use arrows to move, type to filter, ? for more help][0m
+[39m  Large[0m
+[1;36m> Medium[0m
+[39m  Micro[0m
+7[1A[0G[1A[0G
