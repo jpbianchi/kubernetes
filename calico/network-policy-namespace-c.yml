@@ -7,8 +7,6 @@ spec:
   podSelector:
     matchLabels:
       name: postgres
-  policyTypes:
-  - Ingress
   ingress:
     - from: 
       - namespaceSelector:
