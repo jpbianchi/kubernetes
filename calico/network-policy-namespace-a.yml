@@ -5,14 +5,11 @@ metadata:
   namespace: namespace-a
 spec:
   podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
   ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: namespace-b
+          name: namespace-b
   egress:
   - to:
     - namespaceSelector:
