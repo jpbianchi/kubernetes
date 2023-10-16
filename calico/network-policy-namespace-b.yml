@@ -5,6 +5,8 @@ metadata:
   namespace: namespace-b
 spec:
   podSelector:
+    matchLabels:
+      name: nginx
   policyTypes:
   - Ingress
   - Egress
