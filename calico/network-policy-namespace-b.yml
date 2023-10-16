@@ -4,7 +4,7 @@ metadata:
   name: network-policy-for-namespace-b
   namespace: namespace-b
 spec:
-  podSelector: {}
+  podSelector:
   policyTypes:
   - Ingress
   - Egress
