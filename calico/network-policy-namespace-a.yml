@@ -20,7 +20,6 @@ spec:
         - key: namespace
           operator: In
           values: ["namespace-b","namespace-c"]
-          name: namespace-b
 
 # kubectl get pods --all_namespaces -o wide
 # NAMESPACE              NAME                                         READY   STATUS    RESTARTS       AGE    IP             NODE       NOMINATED NODE   READINESS GATES
