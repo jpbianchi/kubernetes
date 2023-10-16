@@ -4,7 +4,9 @@ metadata:
   name: network-policy-for-namespace-a
   namespace: namespace-a
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      name: nginx
   ingress:
   - from:
     - namespaceSelector:
@@ -13,10 +15,11 @@ spec:
   egress:
   - to:
     - namespaceSelector:
-        matchExpressions:
-        - key: namespace
-          operator: In
-          values: ["namespace-b","namespace-c"]
+        matchLabels:
+          name: namespace-b
+    - namespaceSelector:
+        matchLabels:
+          name: namespace-c
 
 # kubectl get pods --all_namespaces -o wide
 # NAMESPACE              NAME                                         READY   STATUS    RESTARTS       AGE    IP             NODE       NOMINATED NODE   READINESS GATES
