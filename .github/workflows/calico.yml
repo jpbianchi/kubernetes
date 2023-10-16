@@ -72,6 +72,8 @@ jobs:
 
           C_CONNECT_OUTPUT=`kubectl exec nginx -n namespace-b -- timeout 5s curl $POD_C_IP:$POD_C_PORT &>/dev/null; echo $?`
           CONNECT_TO_C=`echo $C_CONNECT_OUTPUT | grep -oE '\w+$'`
+          echo $C_CONNECT_OUTPUT
+          echo $CONNECT_TO_C
           if [ "$CONNECT_TO_C" != "52" ]; then
             echo "✅ Cannot ping pods in namespace-c"
           else
