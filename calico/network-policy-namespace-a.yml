@@ -4,9 +4,7 @@ metadata:
   name: network-policy-for-namespace-a
   namespace: namespace-a
 spec:
-  podSelector: 
-    matchLabels:
-      name: nginx
+  podSelector: {}
   policyTypes:
   - Ingress
   - Egress
